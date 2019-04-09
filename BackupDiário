@@ -1,0 +1,52 @@
+DECLARE @name VARCHAR(50) -- Nome do banco 
+DECLARE @path VARCHAR(256) -- path do Bakcup 
+DECLARE @fileName VARCHAR(256) -- Nome do arquivo de backup 
+ 
+Declare @nameBackup VARCHAR(256)
+
+---Diretório Base específico Ajustar aqui para sua estrutura de infra
+SET @path = 'd:\Backup\'  
+-- Diretório Base específico, para cada banco deverá ter um diretório com o mesmo nome do DataBase
+--por exemplo se você tiver um banco chamado Vendas dentro do path deverá ter um diretório
+--chamado vendas
+
+
+ 
+
+ 
+DECLARE db_cursor CURSOR FOR  
+SELECT name 
+FROM master.dbo.sysdatabases 
+WHERE name   IN ('Banco1','Banco2','Banco3', 'BancoN' )  
+
+ 
+declare @DiaSemana nvarchar(30)
+
+set @DiaSemana =(select case 
+						when DATEPART(dw,getdate()) = 1 then 'Domingo'
+						when DATEPART(dw,getdate()) = 2 then 'Segunda'
+						when DATEPART(dw,getdate()) = 3 then 'Terca'
+						when DATEPART(dw,getdate()) = 4 then 'Quarta'
+						when DATEPART(dw,getdate()) = 5 then 'Quinta'
+						when DATEPART(dw,getdate()) = 6 then 'Sexta'
+						when DATEPART(dw,getdate()) = 7 then 'Sabado'
+						end
+)
+
+OPEN db_cursor   
+FETCH NEXT FROM db_cursor INTO @name   
+
+ 
+WHILE @@FETCH_STATUS = 0   
+BEGIN   
+    --Local exemplo para banco 1
+    --d:\backup\Banco1\Banco1_Segunda.Back
+	SET @fileName = @path + @name + '\'  + @name + '_' + @DiaSemana + '.BAK'  
+    --Seta o nome logico do backup
+    set @nameBackup  = @name + ' Full de ' + @DiaSemana 
+    --Realiza o backup 
+	BACKUP DATABASE @name TO DISK = @fileName  WITH NOFORMAT, INIT,  NAME =@nameBackup, SKIP, NOREWIND, NOUNLOAD,  STATS = 10
+	FETCH NEXT FROM db_cursor INTO @name   
+END   
+close db_cursor
+deallocate db_cursor 
