@@ -3,7 +3,6 @@ CREATE TABLE #Tabelas
     nome varchar(255),
     Total int
 )
-
 EXEC sp_MSForEachTable @command1='INSERT #Tabelas (nome, Total) SELECT ''?'', COUNT(*) FROM ?'
 SELECT nome, Total FROM #Tabelas ORDER BY Total, nome DESC
 DROP TABLE #Tabelas
