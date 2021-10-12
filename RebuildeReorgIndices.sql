@@ -1,4 +1,4 @@
- declare @tableName nvarchar(500) 
+declare @tableName nvarchar(500) 
 declare @indexName nvarchar(500) 
 declare @indexType nvarchar(55) 
 declare @percentFragment decimal(11,2) 
